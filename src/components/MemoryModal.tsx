@@ -14,7 +14,23 @@ export const MemoryModal = ({ isOpen, onClose }: MemoryModalProps) => {
   if (!isOpen) return null;
 
   const handleSave = () => {
-    toast.success("Memory added successfully!");
+    if (!memory.trim()) {
+      toast.error("Please enter memory content before saving", {
+        style: {
+          background: "hsl(var(--surface-elevated))",
+          color: "hsl(var(--text-primary))",
+          border: "1px solid hsl(var(--stroke))",
+        },
+      });
+      return;
+    }
+    toast.success("Memory added successfully!", {
+      style: {
+        background: "hsl(var(--surface-elevated))",
+        color: "hsl(var(--text-primary))",
+        border: "1px solid hsl(var(--stroke))",
+      },
+    });
     setMemory("");
     setTags("");
     onClose();

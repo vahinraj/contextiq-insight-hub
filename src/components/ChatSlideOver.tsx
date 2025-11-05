@@ -6,8 +6,33 @@ interface ChatSlideOverProps {
   onClose: () => void;
 }
 
+interface Message {
+  text: string;
+  isUser: boolean;
+}
+
 export const ChatSlideOver = ({ isOpen, onClose }: ChatSlideOverProps) => {
   const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      text: "Hi! I'm your Context AI assistant. I can help you understand recent decisions, task ownership, and project context.",
+      isUser: false,
+    },
+  ]);
+
+  const handleSend = () => {
+    if (!message.trim()) return;
+    
+    setMessages([...messages, { text: message, isUser: true }]);
+    setMessage("");
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -37,29 +62,17 @@ export const ChatSlideOver = ({ isOpen, onClose }: ChatSlideOverProps) => {
 
           {/* Chat Messages */}
           <div className="flex-1 p-6 overflow-y-auto space-y-4">
-            <div className="flex justify-start">
-              <div className="glass-card p-4 max-w-[80%]">
-                <p className="text-sm text-[hsl(var(--text-body))]">
-                  Hi! I'm your Context AI assistant. I can help you understand recent decisions, task ownership, and project context.
-                </p>
+            {messages.map((msg, idx) => (
+              <div key={idx} className={`flex ${msg.isUser ? "justify-end" : "justify-start"}`}>
+                <div className={`p-4 max-w-[80%] rounded-xl ${
+                  msg.isUser 
+                    ? "bg-[hsl(var(--accent-teal))] text-[hsl(var(--accent-teal-fg))]" 
+                    : "glass-card text-[hsl(var(--text-body))]"
+                }`}>
+                  <p className="text-sm">{msg.text}</p>
+                </div>
               </div>
-            </div>
-
-            <div className="flex justify-end">
-              <div className="glass-card-elevated p-4 max-w-[80%] bg-[hsl(var(--accent-teal))]">
-                <p className="text-sm text-[hsl(var(--accent-teal-fg))]">
-                  What tasks are overdue?
-                </p>
-              </div>
-            </div>
-
-            <div className="flex justify-start">
-              <div className="glass-card p-4 max-w-[80%]">
-                <p className="text-sm text-[hsl(var(--text-body))]">
-                  You currently have 3 overdue tasks. The "Web Mockup" task is the most urgent, due 20 hours ago.
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
 
           {/* Input */}
@@ -69,10 +82,14 @@ export const ChatSlideOver = ({ isOpen, onClose }: ChatSlideOverProps) => {
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
                 placeholder="Ask about recent decisions, tasks, or owners…"
                 className="flex-1 px-4 py-3 rounded-xl bg-[hsl(var(--surface-elevated))] border border-[hsl(var(--stroke))] text-[hsl(var(--text-body))] placeholder:text-[hsl(var(--text-muted))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--accent-teal))] transition-all"
               />
-              <button className="px-5 py-3 rounded-xl bg-[hsl(var(--accent-teal))] text-[hsl(var(--accent-teal-fg))] font-semibold hover:scale-[1.02] hover:shadow-[0_8px_24px_hsl(var(--accent-teal)/0.3)] transition-all duration-200">
+              <button 
+                onClick={handleSend}
+                className="px-5 py-3 rounded-xl bg-[hsl(var(--accent-teal))] text-[hsl(var(--accent-teal-fg))] font-semibold hover:scale-[1.02] hover:shadow-[0_8px_24px_hsl(var(--accent-teal)/0.3)] transition-all duration-200"
+              >
                 <Send className="w-5 h-5" />
               </button>
             </div>
