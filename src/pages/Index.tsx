@@ -10,7 +10,6 @@ import { ChatSlideOver } from "@/components/ChatSlideOver";
 import { MemoryModal } from "@/components/MemoryModal";
 import { ProjectNameModal } from "@/components/ProjectNameModal";
 import { AddTaskModal } from "@/components/AddTaskModal";
-import { InviteMemberModal } from "@/components/InviteMemberModal";
 
 interface Task {
   id: string;
@@ -25,7 +24,6 @@ const Index = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProjectNameModalOpen, setIsProjectNameModalOpen] = useState(true);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
-  const [isInviteMemberModalOpen, setIsInviteMemberModalOpen] = useState(false);
   
   const [projectName, setProjectName] = useState("");
   const [projects, setProjects] = useState<string[]>([]);
@@ -95,10 +93,6 @@ const Index = () => {
     toast.success("All tasks loaded");
   };
 
-  const handleInviteMember = (member: { name: string; method: string }) => {
-    toast.success(`Invitation sent to ${member.name} via ${member.method}!`);
-  };
-
   const totalTasks = tasks.length + completedTasks;
   const assignedTasks = tasks.length;
 
@@ -123,7 +117,6 @@ const Index = () => {
             projectName={projectName || "Project Name"}
             people={people}
             moreCount={4}
-            onMemberClick={() => setIsInviteMemberModalOpen(true)}
           />
 
           {/* KPI Strip */}
@@ -174,14 +167,12 @@ const Index = () => {
                 )}
               </div>
 
-              {tasks.length > 0 && (
-                <button
-                  onClick={handleShowAll}
-                  className="w-full mt-6 px-5 py-3 rounded-xl bg-transparent border border-[hsl(var(--stroke))] text-[hsl(var(--text-body))] font-semibold hover:bg-[hsl(var(--surface-elevated))] transition-all duration-200"
-                >
-                  Show All
-                </button>
-              )}
+              <button
+                onClick={handleShowAll}
+                className="w-full mt-6 px-5 py-3 rounded-xl bg-transparent border border-[hsl(var(--stroke))] text-[hsl(var(--text-body))] font-semibold hover:bg-[hsl(var(--surface-elevated))] transition-all duration-200"
+              >
+                Show All
+              </button>
             </div>
 
             {/* Right: Chat & Memory */}
@@ -232,11 +223,6 @@ const Index = () => {
         isOpen={isAddTaskModalOpen}
         onClose={() => setIsAddTaskModalOpen(false)}
         onAddTask={handleAddTask}
-      />
-      <InviteMemberModal
-        isOpen={isInviteMemberModalOpen}
-        onClose={() => setIsInviteMemberModalOpen(false)}
-        onInvite={handleInviteMember}
       />
       <ChatSlideOver isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       <MemoryModal isOpen={isMemoryOpen} onClose={() => setIsMemoryOpen(false)} />
