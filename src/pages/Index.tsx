@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MessageSquare, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Sidebar } from "@/components/Sidebar";
@@ -8,38 +8,101 @@ import { KPICard } from "@/components/KPICard";
 import { TaskCard } from "@/components/TaskCard";
 import { ChatSlideOver } from "@/components/ChatSlideOver";
 import { MemoryModal } from "@/components/MemoryModal";
+import { ProjectNameModal } from "@/components/ProjectNameModal";
+import { AddTaskModal } from "@/components/AddTaskModal";
 
-const demoData = {
-  projectName: "Project Name",
-  kpis: [
-    { label: "Total Project", value: 7, delta: "+2", state: "up" as const },
-    { label: "Total Tasks", value: 49, delta: "+4", state: "up" as const },
-    { label: "Assigned Tasks", value: 12, delta: "-3", state: "down-warn" as const },
-    { label: "Completed Tasks", value: 6, delta: "+1", state: "up" as const },
-    { label: "Overdue Tasks", value: 3, delta: "-2", state: "down-danger" as const },
-  ],
-  tasks: [
-    { title: "Web Mockup", subtitle: "Yellow Branding", due: "Due in 20 hours" },
-    { title: "Cart Landing Page", subtitle: "Cart UI/UX", due: "Due in 3 days" },
-    { title: "POS UI/UX", subtitle: "Resto Dashboard", due: "Due in 1 week" },
-  ],
-  people: [
-    { name: "Ava", avatar: "" },
-    { name: "Jon", avatar: "" },
-    { name: "Mia", avatar: "" },
-    { name: "Kai", avatar: "" },
-  ],
-  moreCount: 4,
-};
+interface Task {
+  id: string;
+  title: string;
+  subtitle: string;
+  due: string;
+}
 
 const Index = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isMemoryOpen, setIsMemoryOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isProjectNameModalOpen, setIsProjectNameModalOpen] = useState(true);
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  
+  const [projectName, setProjectName] = useState("");
+  const [projects, setProjects] = useState<string[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([
+    { id: "1", title: "Web Mockup", subtitle: "Yellow Branding", due: "Due in 20 hours" },
+    { id: "2", title: "Cart Landing Page", subtitle: "Cart UI/UX", due: "Due in 3 days" },
+    { id: "3", title: "POS UI/UX", subtitle: "Resto Dashboard", due: "Due in 1 week" },
+  ]);
+  const [completedTasks, setCompletedTasks] = useState(0);
+
+  const people = [
+    { name: "Ava", avatar: "" },
+    { name: "Jon", avatar: "" },
+    { name: "Mia", avatar: "" },
+    { name: "Kai", avatar: "" },
+  ];
+
+  useEffect(() => {
+    const savedProjectName = localStorage.getItem("projectName");
+    const savedProjects = localStorage.getItem("projects");
+    const savedTasks = localStorage.getItem("tasks");
+    const savedCompletedTasks = localStorage.getItem("completedTasks");
+
+    if (savedProjectName) {
+      setProjectName(savedProjectName);
+      setIsProjectNameModalOpen(false);
+    }
+    if (savedProjects) {
+      setProjects(JSON.parse(savedProjects));
+    }
+    if (savedTasks) {
+      setTasks(JSON.parse(savedTasks));
+    }
+    if (savedCompletedTasks) {
+      setCompletedTasks(parseInt(savedCompletedTasks));
+    }
+  }, []);
+
+  const handleProjectNameSubmit = (name: string) => {
+    setProjectName(name);
+    const newProjects = [...projects, name];
+    setProjects(newProjects);
+    localStorage.setItem("projectName", name);
+    localStorage.setItem("projects", JSON.stringify(newProjects));
+    setIsProjectNameModalOpen(false);
+    toast.success(`Project "${name}" created!`);
+  };
+
+  const handleAddTask = (newTask: { title: string; subtitle: string; due: string }) => {
+    const taskWithId = { ...newTask, id: Date.now().toString() };
+    const updatedTasks = [...tasks, taskWithId];
+    setTasks(updatedTasks);
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  };
+
+  const handleCompleteTask = (taskId: string) => {
+    const updatedTasks = tasks.filter(task => task.id !== taskId);
+    setTasks(updatedTasks);
+    const newCompletedCount = completedTasks + 1;
+    setCompletedTasks(newCompletedCount);
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+    localStorage.setItem("completedTasks", newCompletedCount.toString());
+    toast.success("Task completed!");
+  };
 
   const handleShowAll = () => {
     toast.success("All tasks loaded");
   };
+
+  const totalTasks = tasks.length + completedTasks;
+  const assignedTasks = tasks.length;
+
+  const kpis = [
+    { label: "Total Projects", value: projects.length, delta: "+1", state: "up" as const },
+    { label: "Total Tasks", value: totalTasks, delta: `+${tasks.length}`, state: "up" as const },
+    { label: "Assigned Tasks", value: assignedTasks, delta: tasks.length > 0 ? `+${tasks.length}` : "0", state: tasks.length > 0 ? "up" as const : "down-warn" as const },
+    { label: "Completed Tasks", value: completedTasks, delta: completedTasks > 0 ? `+${completedTasks}` : "0", state: completedTasks > 0 ? "up" as const : "down-warn" as const },
+    { label: "Overdue Tasks", value: 0, delta: "0", state: "up" as const },
+  ];
 
   return (
     <div className="min-h-screen w-full">
@@ -51,14 +114,14 @@ const Index = () => {
         <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <Header
-            projectName={demoData.projectName}
-            people={demoData.people}
-            moreCount={demoData.moreCount}
+            projectName={projectName || "Project Name"}
+            people={people}
+            moreCount={4}
           />
 
           {/* KPI Strip */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-            {demoData.kpis.map((kpi, idx) => (
+            {kpis.map((kpi, idx) => (
               <KPICard
                 key={idx}
                 label={kpi.label}
@@ -74,19 +137,34 @@ const Index = () => {
           <div className="grid grid-cols-1 lg:grid-cols-[62%_38%] gap-6">
             {/* Left: Assigned Tasks */}
             <div className="glass-card p-6 stagger-fade-in" style={{ animationDelay: '0.6s' }}>
-              <h2 className="text-lg font-bold text-[hsl(var(--text-primary))] mb-4 pb-3 border-b border-[hsl(var(--stroke))]">
-                Assigned Tasks
-              </h2>
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-[hsl(var(--stroke))]">
+                <h2 className="text-lg font-bold text-[hsl(var(--text-primary))]">
+                  Assigned Tasks
+                </h2>
+                <button
+                  onClick={() => setIsAddTaskModalOpen(true)}
+                  className="px-4 py-2 rounded-full bg-[hsl(var(--accent-teal))] text-[hsl(var(--accent-teal-fg))] text-sm font-semibold hover:scale-[1.02] hover:shadow-[0_8px_24px_hsl(var(--accent-teal)/0.3)] transition-all duration-200 flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Task
+                </button>
+              </div>
 
               <div className="space-y-4">
-                {demoData.tasks.map((task, idx) => (
+                {tasks.map((task) => (
                   <TaskCard
-                    key={idx}
+                    key={task.id}
                     title={task.title}
                     subtitle={task.subtitle}
                     due={task.due}
+                    onComplete={() => handleCompleteTask(task.id)}
                   />
                 ))}
+                {tasks.length === 0 && (
+                  <p className="text-center text-[hsl(var(--text-muted))] py-8">
+                    No tasks yet. Click "Add Task" to get started!
+                  </p>
+                )}
               </div>
 
               <button
@@ -137,6 +215,15 @@ const Index = () => {
       </main>
 
       {/* Modals */}
+      <ProjectNameModal 
+        isOpen={isProjectNameModalOpen} 
+        onSubmit={handleProjectNameSubmit} 
+      />
+      <AddTaskModal
+        isOpen={isAddTaskModalOpen}
+        onClose={() => setIsAddTaskModalOpen(false)}
+        onAddTask={handleAddTask}
+      />
       <ChatSlideOver isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       <MemoryModal isOpen={isMemoryOpen} onClose={() => setIsMemoryOpen(false)} />
     </div>
