@@ -9,9 +9,10 @@ interface HeaderProps {
   projectName: string;
   people: Person[];
   moreCount: number;
+  onMemberClick: () => void;
 }
 
-export const Header = ({ projectName, people, moreCount }: HeaderProps) => {
+export const Header = ({ projectName, people, moreCount, onMemberClick }: HeaderProps) => {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 stagger-fade-in" style={{ animationDelay: '0.1s' }}>
       <h1 className="text-[32px] sm:text-[36px] font-bold text-[hsl(var(--text-primary))]">
@@ -36,7 +37,10 @@ export const Header = ({ projectName, people, moreCount }: HeaderProps) => {
         </div>
 
         {/* Add Member Button */}
-        <button className="h-9 px-5 rounded-full bg-[hsl(var(--surface-elevated))] border border-[hsl(var(--stroke))] text-[hsl(var(--text-body))] text-sm font-medium hover:bg-[hsl(var(--accent-teal))] hover:text-[hsl(var(--accent-teal-fg))] hover:border-[hsl(var(--accent-teal))] transition-all duration-200 flex items-center gap-2">
+        <button
+          onClick={onMemberClick}
+          className="h-9 px-5 rounded-full bg-[hsl(var(--surface-elevated))] border border-[hsl(var(--stroke))] text-[hsl(var(--text-body))] text-sm font-medium hover:bg-[hsl(var(--accent-teal))] hover:text-[hsl(var(--accent-teal-fg))] hover:border-[hsl(var(--accent-teal))] transition-all duration-200 flex items-center gap-2"
+        >
           <Plus className="w-4 h-4" />
           Member
         </button>
