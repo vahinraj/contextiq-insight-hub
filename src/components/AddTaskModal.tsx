@@ -3,7 +3,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { X } from "lucide-react";
 import { toast } from "sonner";
 
 interface AddTaskModalProps {
@@ -49,13 +48,6 @@ export const AddTaskModal = ({ isOpen, onClose, onAddTask }: AddTaskModalProps) 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="bg-[hsl(var(--surface))] border-[hsl(var(--stroke))] max-w-md">
-        <button
-          onClick={handleClose}
-          className="absolute right-4 top-4 rounded-full p-2 hover:bg-[hsl(var(--surface-elevated))] transition-colors"
-        >
-          <X className="h-4 w-4 text-[hsl(var(--text-muted))]" />
-        </button>
-        
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-[hsl(var(--text-primary))]">
             Add New Task
