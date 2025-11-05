@@ -35,6 +35,7 @@ const demoData = {
 const Index = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isMemoryOpen, setIsMemoryOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleShowAll = () => {
     toast.success("All tasks loaded");
@@ -42,11 +43,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen w-full">
-      <Sidebar />
-      <TopBar />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <TopBar onMenuClick={() => setIsSidebarOpen(true)} />
 
       {/* Main Content */}
-      <main className="ml-[72px] pt-12">
+      <main className="pt-12">
         <div className="max-w-[1320px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <Header

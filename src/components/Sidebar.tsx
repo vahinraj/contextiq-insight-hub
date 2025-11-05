@@ -1,42 +1,42 @@
-import { LayoutDashboard, LogOut } from "lucide-react";
-import { useState } from "react";
+import { Home, LayoutDashboard, X } from "lucide-react";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
-export const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
+export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   return (
-    <aside
-      className={`fixed left-0 top-0 h-screen bg-[hsl(var(--sidebar-bg))] border-r border-[hsl(var(--stroke))] transition-all duration-300 z-50 ${
-        isCollapsed ? "w-14" : "w-[72px]"
-      }`}
-    >
-      <div className="flex flex-col h-full py-6">
-        {/* Logo */}
-        <div className="px-4 mb-8">
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-[hsl(var(--text-primary))] font-semibold text-sm tracking-tight hover:opacity-80 transition-opacity"
-          >
-            {isCollapsed ? "C" : "ContextIQ"}
-          </button>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 px-3">
-          <div className="relative">
-            <button className="w-full flex items-center justify-center gap-3 px-3 py-3 rounded-full bg-[hsl(var(--sidebar-active))] text-[hsl(var(--text-primary))] shadow-[0_0_24px_hsl(var(--accent-teal)/0.1)] transition-all duration-200 hover:scale-[1.02]">
-              <LayoutDashboard className="w-5 h-5" />
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent side="left" className="w-[280px] bg-[hsl(var(--sidebar-bg))] border-r border-[hsl(var(--stroke))] p-0">
+        <div className="flex flex-col h-full py-6">
+          {/* Header with Close Button */}
+          <div className="px-6 mb-8 flex items-center justify-between">
+            <h2 className="text-[hsl(var(--text-primary))] font-semibold text-lg tracking-tight">
+              ContextIQ
+            </h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-[hsl(var(--surface-elevated))] rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5 text-[hsl(var(--text-muted))]" />
             </button>
           </div>
-        </nav>
 
-        {/* Logout */}
-        <div className="px-3">
-          <button className="w-full flex items-center justify-center gap-3 px-3 py-3 rounded-full text-[hsl(var(--text-muted))] hover:text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--surface))] transition-all duration-200 group">
-            <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
-          </button>
+          {/* Navigation */}
+          <nav className="flex-1 px-4 space-y-2">
+            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--surface-elevated))] transition-all duration-200">
+              <Home className="w-5 h-5" />
+              <span className="font-medium">Home</span>
+            </button>
+            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-[hsl(var(--sidebar-active))] text-[hsl(var(--text-primary))] shadow-[0_0_24px_hsl(var(--accent-teal)/0.1)] transition-all duration-200">
+              <LayoutDashboard className="w-5 h-5" />
+              <span className="font-medium">Dashboard</span>
+            </button>
+          </nav>
         </div>
-      </div>
-    </aside>
+      </SheetContent>
+    </Sheet>
   );
 };

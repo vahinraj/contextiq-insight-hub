@@ -1,13 +1,25 @@
-import { MoreVertical, User } from "lucide-react";
+import { MoreVertical, User, Menu } from "lucide-react";
 
-export const TopBar = () => {
+interface TopBarProps {
+  onMenuClick: () => void;
+}
+
+export const TopBar = ({ onMenuClick }: TopBarProps) => {
   return (
-    <div className="fixed top-0 left-[72px] right-0 h-12 bg-[hsl(var(--surface))] border-b border-[hsl(var(--stroke))] flex items-center justify-between px-6 z-40">
-      {/* macOS Dots */}
-      <div className="flex items-center gap-2">
-        <div className="w-3 h-3 rounded-full bg-[#EF4444]"></div>
-        <div className="w-3 h-3 rounded-full bg-[#F59E0B]"></div>
-        <div className="w-3 h-3 rounded-full bg-[#22C55E]"></div>
+    <div className="fixed top-0 left-0 right-0 h-12 bg-[hsl(var(--surface))] border-b border-[hsl(var(--stroke))] flex items-center justify-between px-6 z-40">
+      {/* Hamburger Menu */}
+      <button 
+        onClick={onMenuClick}
+        className="p-2 hover:bg-[hsl(var(--surface-elevated))] rounded-lg transition-colors"
+      >
+        <Menu className="w-5 h-5 text-[hsl(var(--text-primary))]" />
+      </button>
+
+      {/* Centered Logo */}
+      <div className="absolute left-1/2 transform -translate-x-1/2">
+        <h1 className="text-[hsl(var(--text-primary))] font-semibold text-sm tracking-tight">
+          ContextIQ
+        </h1>
       </div>
 
       {/* Right Actions */}
