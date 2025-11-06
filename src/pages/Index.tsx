@@ -10,6 +10,8 @@ import { ChatSlideOver } from "@/components/ChatSlideOver";
 import { MemoryModal } from "@/components/MemoryModal";
 import { ProjectNameModal } from "@/components/ProjectNameModal";
 import { AddTaskModal } from "@/components/AddTaskModal";
+import { InviteMemberModal } from "@/components/InviteMemberModal";
+import { MeetingBotCard } from "@/components/MeetingBotCard";
 
 interface Task {
   id: string;
@@ -24,6 +26,7 @@ const Index = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProjectNameModalOpen, setIsProjectNameModalOpen] = useState(true);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  const [isInviteMemberModalOpen, setIsInviteMemberModalOpen] = useState(false);
   
   const [projectName, setProjectName] = useState("");
   const [projects, setProjects] = useState<string[]>([]);
@@ -117,6 +120,7 @@ const Index = () => {
             projectName={projectName || "Project Name"}
             people={people}
             moreCount={4}
+            onAddMember={() => setIsInviteMemberModalOpen(true)}
           />
 
           {/* KPI Strip */}
@@ -167,20 +171,22 @@ const Index = () => {
                 )}
               </div>
 
-              <button
-                onClick={handleShowAll}
-                className="w-full mt-6 px-5 py-3 rounded-xl bg-transparent border border-[hsl(var(--stroke))] text-[hsl(var(--text-body))] font-semibold hover:bg-[hsl(var(--surface-elevated))] transition-all duration-200"
-              >
-                Show All
-              </button>
+              {tasks.length > 0 && (
+                <button
+                  onClick={handleShowAll}
+                  className="w-full mt-6 px-5 py-3 rounded-xl bg-transparent border border-[hsl(var(--stroke))] text-[hsl(var(--text-body))] font-semibold hover:bg-[hsl(var(--surface-elevated))] transition-all duration-200"
+                >
+                  Show All
+                </button>
+              )}
             </div>
 
-            {/* Right: Chat & Memory */}
+            {/* Right: Chat, Memory & Meeting Bot */}
             <div className="space-y-6">
-              {/* Chat with Context IQ */}
+              {/* Chat with WisdomAI */}
               <div className="glass-card p-8 flex flex-col items-center justify-center min-h-[240px] stagger-fade-in" style={{ animationDelay: '0.7s' }}>
                 <h2 className="text-lg font-bold text-[hsl(var(--text-primary))] mb-6 text-center">
-                  Chat with Context IQ
+                  Chat with WisdomAI
                 </h2>
                 <button
                   onClick={() => setIsChatOpen(true)}
@@ -204,12 +210,15 @@ const Index = () => {
                   Add memory
                 </button>
               </div>
+
+              {/* Meeting Bot */}
+              <MeetingBotCard />
             </div>
           </div>
 
           {/* Footer */}
           <footer className="mt-12 text-center text-xs text-[hsl(var(--text-muted))]">
-            © 2025 ContextIQ – Demo
+            © 2025 WisdomAI – Demo
           </footer>
         </div>
       </main>
@@ -223,6 +232,10 @@ const Index = () => {
         isOpen={isAddTaskModalOpen}
         onClose={() => setIsAddTaskModalOpen(false)}
         onAddTask={handleAddTask}
+      />
+      <InviteMemberModal
+        isOpen={isInviteMemberModalOpen}
+        onClose={() => setIsInviteMemberModalOpen(false)}
       />
       <ChatSlideOver isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       <MemoryModal isOpen={isMemoryOpen} onClose={() => setIsMemoryOpen(false)} />

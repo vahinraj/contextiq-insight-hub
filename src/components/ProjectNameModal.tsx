@@ -27,7 +27,7 @@ export const ProjectNameModal = ({ isOpen, onSubmit }: ProjectNameModalProps) =>
       >
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-[hsl(var(--text-primary))]">
-            Welcome to ContextIQ
+            Welcome to WisdomAI
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6 mt-4">

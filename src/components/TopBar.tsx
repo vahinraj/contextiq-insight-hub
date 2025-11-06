@@ -18,7 +18,7 @@ export const TopBar = ({ onMenuClick }: TopBarProps) => {
       {/* Centered Logo */}
       <div className="absolute left-1/2 transform -translate-x-1/2">
         <h1 className="text-[hsl(var(--text-primary))] font-semibold text-sm tracking-tight">
-          ContextIQ
+          WisdomAI
         </h1>
       </div>
 
