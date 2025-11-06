@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MessageSquare, Plus } from "lucide-react";
+import { MessageSquare, Plus, Filter } from "lucide-react";
 import { toast } from "sonner";
 import { Sidebar } from "@/components/Sidebar";
 import { TopBar } from "@/components/TopBar";
@@ -18,7 +18,10 @@ interface Task {
   title: string;
   subtitle: string;
   due: string;
+  deadline?: Date;
 }
+
+type TaskFilter = "all" | "high" | "medium" | "low" | "date";
 
 const Index = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -36,6 +39,8 @@ const Index = () => {
     { id: "3", title: "POS UI/UX", subtitle: "Resto Dashboard", due: "Due in 1 week" },
   ]);
   const [completedTasks, setCompletedTasks] = useState(0);
+  const [taskFilter, setTaskFilter] = useState<TaskFilter>("all");
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
 
   const people = [
     { name: "Ava", avatar: "" },
@@ -75,7 +80,7 @@ const Index = () => {
     toast.success(`Project "${name}" created!`);
   };
 
-  const handleAddTask = (newTask: { title: string; subtitle: string; due: string }) => {
+  const handleAddTask = (newTask: { title: string; subtitle: string; due: string; deadline?: Date }) => {
     const taskWithId = { ...newTask, id: Date.now().toString() };
     const updatedTasks = [...tasks, taskWithId];
     setTasks(updatedTasks);
@@ -95,6 +100,35 @@ const Index = () => {
   const handleShowAll = () => {
     toast.success("All tasks loaded");
   };
+
+  const getTaskPriority = (task: Task): "high" | "medium" | "low" => {
+    if (!task.deadline) return "low";
+    const now = new Date();
+    const deadline = new Date(task.deadline);
+    const daysUntil = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (daysUntil <= 2) return "high";
+    if (daysUntil <= 7) return "medium";
+    return "low";
+  };
+
+  const getFilteredTasks = () => {
+    let filtered = [...tasks];
+    
+    if (taskFilter === "high" || taskFilter === "medium" || taskFilter === "low") {
+      filtered = filtered.filter(task => getTaskPriority(task) === taskFilter);
+    } else if (taskFilter === "date") {
+      filtered.sort((a, b) => {
+        if (!a.deadline) return 1;
+        if (!b.deadline) return -1;
+        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+      });
+    }
+    
+    return filtered;
+  };
+
+  const filteredTasks = getFilteredTasks();
 
   const totalTasks = tasks.length + completedTasks;
   const assignedTasks = tasks.length;
@@ -145,28 +179,88 @@ const Index = () => {
                 <h2 className="text-lg font-bold text-[hsl(var(--text-primary))]">
                   Assigned Tasks
                 </h2>
-                <button
-                  onClick={() => setIsAddTaskModalOpen(true)}
-                  className="px-4 py-2 rounded-full bg-[hsl(var(--accent-teal))] text-[hsl(var(--accent-teal-fg))] text-sm font-semibold hover:scale-[1.02] hover:shadow-[0_8px_24px_hsl(var(--accent-teal)/0.3)] transition-all duration-200 flex items-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Task
-                </button>
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowFilterMenu(!showFilterMenu)}
+                      className={`w-10 h-10 rounded-full border border-[hsl(var(--stroke))] flex items-center justify-center hover:bg-[hsl(var(--surface-elevated))] transition-all duration-200 ${
+                        taskFilter !== "all" ? "bg-[hsl(var(--accent-teal)/0.1)] border-[hsl(var(--accent-teal))]" : "bg-transparent"
+                      }`}
+                      title="Filter tasks"
+                    >
+                      <Filter className={`w-4 h-4 ${taskFilter !== "all" ? "text-[hsl(var(--accent-teal))]" : "text-[hsl(var(--text-body))]"}`} />
+                    </button>
+                    
+                    {showFilterMenu && (
+                      <div className="absolute right-0 top-12 w-48 glass-card p-2 z-10 space-y-1">
+                        <button
+                          onClick={() => { setTaskFilter("all"); setShowFilterMenu(false); }}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                            taskFilter === "all" ? "bg-[hsl(var(--surface-elevated))] text-[hsl(var(--text-primary))]" : "text-[hsl(var(--text-body))] hover:bg-[hsl(var(--surface-elevated))]"
+                          }`}
+                        >
+                          All Tasks
+                        </button>
+                        <button
+                          onClick={() => { setTaskFilter("high"); setShowFilterMenu(false); }}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                            taskFilter === "high" ? "bg-[hsl(var(--surface-elevated))] text-[hsl(var(--text-primary))]" : "text-[hsl(var(--text-body))] hover:bg-[hsl(var(--surface-elevated))]"
+                          }`}
+                        >
+                          High Priority
+                        </button>
+                        <button
+                          onClick={() => { setTaskFilter("medium"); setShowFilterMenu(false); }}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                            taskFilter === "medium" ? "bg-[hsl(var(--surface-elevated))] text-[hsl(var(--text-primary))]" : "text-[hsl(var(--text-body))] hover:bg-[hsl(var(--surface-elevated))]"
+                          }`}
+                        >
+                          Medium Priority
+                        </button>
+                        <button
+                          onClick={() => { setTaskFilter("low"); setShowFilterMenu(false); }}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                            taskFilter === "low" ? "bg-[hsl(var(--surface-elevated))] text-[hsl(var(--text-primary))]" : "text-[hsl(var(--text-body))] hover:bg-[hsl(var(--surface-elevated))]"
+                          }`}
+                        >
+                          Low Priority
+                        </button>
+                        <button
+                          onClick={() => { setTaskFilter("date"); setShowFilterMenu(false); }}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                            taskFilter === "date" ? "bg-[hsl(var(--surface-elevated))] text-[hsl(var(--text-primary))]" : "text-[hsl(var(--text-body))] hover:bg-[hsl(var(--surface-elevated))]"
+                          }`}
+                        >
+                          Sort by Date
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <button
+                    onClick={() => setIsAddTaskModalOpen(true)}
+                    className="px-4 py-2 rounded-full bg-[hsl(var(--accent-teal))] text-[hsl(var(--accent-teal-fg))] text-sm font-semibold hover:scale-[1.02] hover:shadow-[0_8px_24px_hsl(var(--accent-teal)/0.3)] transition-all duration-200 flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Task
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-4">
-                {tasks.map((task) => (
+                {filteredTasks.map((task) => (
                   <TaskCard
                     key={task.id}
                     title={task.title}
                     subtitle={task.subtitle}
                     due={task.due}
+                    deadline={task.deadline}
                     onComplete={() => handleCompleteTask(task.id)}
                   />
                 ))}
-                {tasks.length === 0 && (
+                {filteredTasks.length === 0 && (
                   <p className="text-center text-[hsl(var(--text-muted))] py-8">
-                    No tasks yet. Click "Add Task" to get started!
+                    {taskFilter === "all" ? "No tasks yet. Click 'Add Task' to get started!" : "No tasks found with this filter."}
                   </p>
                 )}
               </div>

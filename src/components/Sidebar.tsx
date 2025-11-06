@@ -1,5 +1,6 @@
-import { Home, LayoutDashboard } from "lucide-react";
+import { Home, LayoutDashboard, Brain } from "lucide-react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { useNavigate } from "react-router-dom";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -7,6 +8,8 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
+  const navigate = useNavigate();
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent side="left" className="w-[280px] bg-[hsl(var(--sidebar-bg))] border-r border-[hsl(var(--stroke))] p-0">
@@ -14,19 +17,35 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           {/* Header */}
           <div className="px-6 mb-8">
             <h2 className="text-[hsl(var(--text-primary))] font-semibold text-lg tracking-tight">
-              ContextIQ
+              WisdomAI
             </h2>
           </div>
 
           {/* Navigation */}
           <nav className="flex-1 px-4 space-y-2">
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--surface-elevated))] transition-all duration-200">
+            <button 
+              onClick={() => {
+                navigate("/");
+                onClose();
+              }}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--surface-elevated))] transition-all duration-200"
+            >
               <Home className="w-5 h-5" />
               <span className="font-medium">Home</span>
             </button>
             <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-[hsl(var(--sidebar-active))] text-[hsl(var(--text-primary))] shadow-[0_0_24px_hsl(var(--accent-teal)/0.1)] transition-all duration-200">
               <LayoutDashboard className="w-5 h-5" />
               <span className="font-medium">Dashboard</span>
+            </button>
+            <button 
+              onClick={() => {
+                navigate("/manage-memory");
+                onClose();
+              }}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--surface-elevated))] transition-all duration-200"
+            >
+              <Brain className="w-5 h-5" />
+              <span className="font-medium">Manage Memory</span>
             </button>
           </nav>
         </div>
